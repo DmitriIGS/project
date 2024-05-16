@@ -1,36 +1,27 @@
 from tests.pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 import configparser
-import logger
 import allure
 
 
 login_btn_selector = (By.XPATH, '//*[@id="split-auth-sso"]/a')
-create_tsk_btn_selector = (By.XPATH, "//li[@id='create-menu']")
 
 
 class LoginPage(BasePage):
     def __init__(self, browser, rand_number_for_entites):
         super().__init__(browser, rand_number_for_entites)
-    
+        self.config = configparser.ConfigParser()
+        self.config.read("pytest.ini", encoding="utf-8")
+
 
     def open_jira(self):
-        with allure.step('Открытие Jira'):
-            try: 
-                config = configparser.ConfigParser()
-                config.read("pytest.ini")
-                self.browser.get(config["Jira"]["jira_login_page_url"])
-            except Exception as e:
-                logger.error('Не удалось открыть страницу для входа в Jira ', e)
-                self.browser.quit()
-
+        with allure.step('Открытие Jira'): 
+            self.browser.get(self.config["Jira"]["jira_login_page_url"])
+            
     
     def login_jira(self):
-        try:
-            self.find(login_btn_selector).click()
-        except Exception as e:
-            logger.error('Не найдена кнопка входа под своим сотрудником в Jira ', e)
-            self.browser.quit()
+        self.find(login_btn_selector).click()
+        
 
     
    

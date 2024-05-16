@@ -1,13 +1,13 @@
 from tests.pages.jira_login_page import LoginPage
+from tests.pages.task_page import TaskPage
 from tests.pages.jira_main_page import MainPage
-from tests.pages.api_requests import Requests
-# from tests.pages.task_page import TaskPage
+from tests.pages.api_requests import ApiRequests
 import allure
 
 
 @allure.feature('Создание КЕ в БД')
-def test_create_ke_api(browser, rand_number_for_entites):
-    request = Requests(browser, rand_number_for_entites)
+def test_create_ke_api(rand_number_for_entites):
+    request = ApiRequests(rand_number_for_entites)
     request.create_new_ke()
 
 
@@ -31,6 +31,11 @@ def test_create_scdvs_task(browser, rand_number_for_entites):
     create_task.open_task()
 
 
-# def test_check_scdvs_task_fields(browser, rand_number_for_entites):
-#     scdvs_task = TaskPage(browser, rand_number_for_entites)
-#     scdvs_task.open_task()
+@allure.feature("Проверка заполнения полей из КЕ в задаче")
+def test_check_scdvs_task_fields(browser, rand_number_for_entites):
+    scdvs_task = TaskPage(browser, rand_number_for_entites)
+    scdvs_task.check_agreementNUm()
+    scdvs_task.click_equipmentBtn()
+    scdvs_task.check_serialNum()
+    scdvs_task.check_keName()
+    scdvs_task.check_partNum()

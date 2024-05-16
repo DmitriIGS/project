@@ -4,9 +4,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as Ec
 from selenium.webdriver.support.wait import WebDriverWait
 import configparser
-import logger
 import allure
 import time
+from selenium.common.exceptions import TimeoutException
 
 
 create_tsk_btn_selector = (By.XPATH, "//li[@id='create-menu']")
@@ -25,119 +25,84 @@ task_link_locator = (By.XPATH, "//a[@class = 'issue-created-key issue-link']")
 class MainPage(BasePage):
     def __init__(self, browser, rand_number_for_entites):
         super().__init__(browser, rand_number_for_entites)
+        self.config = configparser.ConfigParser()
+        self.config.read("pytest.ini", encoding="utf-8")
         
 
     def click_create_task_btn(self):
         with allure.step('Открытие формы создания задачи'):
-            try:
-                self.find(create_tsk_btn_selector).click()
-            except Exception as e:
-                logger.error('Не удалось открыть форму создания задачи ', e)
-                self.browser.quit()
+            time.sleep(2)
+            self.find(create_tsk_btn_selector).click()
 
 
     @property
     def find_select_prj_field(self):
-        try:
-            self.select_prj = WebDriverWait(self.browser, 15).until(Ec.element_to_be_clickable(select_prj_selector))
-        except:
-            self.browser.quit()
-        finally:
-            return self.select_prj
+        self.select_prj = WebDriverWait(self.browser, 59).until(Ec.element_to_be_clickable(select_prj_selector))
+        return self.select_prj
         
 
     def type_scdvs_prj_field(self):
         with allure.step('Выбор проекта "SCDVS"'):
-            try:
-                self.find_select_prj_field.click()
-                self.find_select_prj_field.send_keys("SCDVS")
-                self.find_select_prj_field.send_keys(Keys.RETURN)
-            except Exception as e:
-                logger.error('Не удалось выбрать проект "SCDVS" для форме создания задачи ', e)
-                self.browser.quit()
-
+            self.find_select_prj_field.click()
+            self.find_select_prj_field.send_keys("SCDVS")
+            self.find_select_prj_field.send_keys(Keys.RETURN)
+            
 
     @property 
-    def find_summary_field(self):
-        try:    
-            WebDriverWait(self.browser, 15).until(Ec.invisibility_of_element_located(span_selector))   
-            self.summary = WebDriverWait(self.browser, 5).until(Ec.element_to_be_clickable(summary_selector))
-        except:
-            self.browser.quit()
-        finally:
-            return self.summary
+    def find_summary_field(self):    
+        WebDriverWait(self.browser, 15).until(Ec.invisibility_of_element_located(span_selector))   
+        self.summary = WebDriverWait(self.browser, 5).until(Ec.element_to_be_clickable(summary_selector))
+        return self.summary
         
 
     def type_summary_prj(self):
         with allure.step('Указание темы задачи'):
-            try:
-                self.find_summary_field.click()
-                self.find_summary_field.send_keys("ТестоваяТема" + self.rand_number_for_entities)
-            except Exception as e:
-                logger.error('Не удалось указать название темы на форме создания задачи ', e)
-
+            self.find_summary_field.click()
+            self.find_summary_field.send_keys("ТестоваяТема" + self.rand_number_for_entities)
+            
 
     @property
     def find_query_field(self):
-        try:
-            self.query_field = WebDriverWait(self.browser, 15).until(Ec.element_to_be_clickable(query_field_selector))
-        except:
-            self.browser.quit()
-        finally:
-            return self.query_field
-    
+        self.query_field = WebDriverWait(self.browser, 15).until(Ec.element_to_be_clickable(query_field_selector))
+        return self.query_field
+       
 
     def choose_query_type(self):
         with allure.step('Выбор типа запроса'):
-            try:
-                self.find_query_field.click()
-                self.find_query_field.send_keys("Запрос на обслуживание")
-                time.sleep(1)
-                self.find_query_field.send_keys(Keys.RETURN)
-            except Exception as e:
-                logger.error('Не удалось выбрать тип запроса ', e)
-                self.browser.quit()
-
+            self.find_query_field.click()
+            self.find_query_field.send_keys("Запрос на обслуживание")
+            time.sleep(1)
+            self.find_query_field.send_keys(Keys.RETURN)
+            
 
     def choose_ke(self):
         with allure.step('Указание нового КЕ'):
-            try:
-                self.find(equipment_selector).click()
-                self.ke_field_btn = WebDriverWait(self.browser, 15).until(Ec.element_to_be_clickable(ke_list_selector))
-                self.ke_field_btn.click()
-                self.ke_field = WebDriverWait(self.browser, 15).until(Ec.element_to_be_clickable(ke_field_selector))
-                self.ke_field.send_keys("CU.2024." + self.rand_number_for_entities)
-                self.ke_option = WebDriverWait(self.browser, 30).until(Ec.presence_of_element_located(ke_option_selector))
-                self.ke_option.click()
-            except Exception as e:
-                logger.error('Не удалось выбрать созданную КЕ для форме создания задачи ', e)
-                self.browser.quit()
+            self.find(equipment_selector).click()
+            self.ke_field_btn = WebDriverWait(self.browser, 15).until(Ec.element_to_be_clickable(ke_list_selector))
+            self.ke_field_btn.click()
+            self.ke_field = WebDriverWait(self.browser, 20).until(Ec.element_to_be_clickable(ke_field_selector))
+            self.ke_field.send_keys("CU.2024." + self.rand_number_for_entities)
+            self.ke_option = WebDriverWait(self.browser, 30).until(Ec.presence_of_element_located(ke_option_selector))
+            self.ke_option.click()
 
 
     def submit_tsk(self):
         with allure.step('Нажатие на кнопку "Создать" форме создания задачи'):    
-            try:
-                WebDriverWait(self.browser, 30).until(Ec.invisibility_of_element_located(span_selector))
-                self.submit_tsk_btn = WebDriverWait(self.browser, 15).until(Ec.element_to_be_clickable(submit_tsk_selector))
-                self.submit_tsk_btn.click()
-            except Exception as e:
-                logger.error('Не удалось нажать на кнопку "Создать" форме создания задачи ', e)
-                self.browser.quit()
-
+            WebDriverWait(self.browser, 30).until(Ec.invisibility_of_element_located(span_selector))
+            self.submit_tsk_btn = WebDriverWait(self.browser, 15).until(Ec.element_to_be_clickable(submit_tsk_selector))
+            self.submit_tsk_btn.click()
+            
 
     def open_task(self):
         with allure.step('Открытие созданной задачи'):
             try:
                 self.task_link = WebDriverWait(self.browser, 60).until(Ec.presence_of_element_located(task_link_locator))
                 self.task_link.click()
-            except: 
-                try:
-                    config = configparser.ConfigParser()
-                    config.read("pytest.ini")
-                    self.browser.get(config["Jira"]["task_page_url"] + self.rand_number_for_entities)
-                    self.browser.execute_script("window.alert = function() {};")
-                except Exception as e:
-                    logger.error('Не удалось открыть созданную задачу ', e)
-                    self.browser.quit() 
-           
+            except TimeoutException:
+                self.browser.get(self.config["Jira"]["task_page_url"] + self.rand_number_for_entities)
+                
+                
+    
+
+    
         
