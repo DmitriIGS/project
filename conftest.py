@@ -2,7 +2,7 @@ import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import random
-from tests.pages.api_requests import ApiRequests
+from tests.api_requests import ApiRequests
 import configparser
 
 

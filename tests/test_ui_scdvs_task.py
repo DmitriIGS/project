@@ -1,7 +1,7 @@
 from tests.pages.jira_login_page import LoginPage
 from tests.pages.task_page import TaskPage
 from tests.pages.jira_main_page import MainPage
-from tests.pages.api_requests import ApiRequests
+from tests.api_requests import ApiRequests
 import allure
 
 

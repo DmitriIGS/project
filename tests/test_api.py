@@ -1,4 +1,4 @@
-from tests.pages.api_requests import ApiRequests
+from tests.api_requests import ApiRequests
 import allure
 
 
