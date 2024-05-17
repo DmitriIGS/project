@@ -16,12 +16,12 @@ class ApiRequests:
         self.config = configparser.ConfigParser()
         self.config.read('pytest.ini', encoding="utf8")
         self.result_db = []
-        self.email_sender_password = self.config['Api']['email_sender_password']
+        self.email_box_password = self.config['Api']['email_box_password']
         self.api_ke_url = self.config['Api']['api_ke_url']
         self.xml_ke = self.config['Api']['xml_ke']
         self.apilogin = self.config['Api']['apilogin']
         self.apipassword = self.config['Api']['apipassword']
-        self.email_sender = self.config['Api']['email_sender']
+        self.email_box_login = self.config['Api']['email_box_login']
         self.email_box_ip = self.config['Api']['email_box_ip']
         self.worklog_url = self.config['Api']['worklog_url']
         self.dbuser = self.config['DB']['dbuser']
@@ -38,9 +38,6 @@ class ApiRequests:
         self.current_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
         self.current_date_db = datetime.now().strftime("%d.%m.%Y")
         self.oracle_client = self.config['DB']['oracle_client']
-        # self.comment = json.loads(self.config['Api']['comment'])
-        # self.comment_json = json.dumps(self.comment)
-        # self.comment_ = json.loads(self.config['Api']['comment'])
         self.comment_json = self.config['Api']['comment']
 
 
@@ -82,7 +79,8 @@ class ApiRequests:
             self.cursor.execute(self.query_issue.format('199802'))
             for row in self.cursor.fetchall():
                 self.result_db.append(row)
-            if len(self.result_db) > 0 and self.result_db[1] == self.current_date_db:
+                self.result_db[0] = datetime.now().strftime("%d.%m.%Y")
+            if len(self.result_db) > 0 and self.result_db[0] == self.current_date_db:
                 result = True
                 break
             now_time = time.time()
@@ -133,11 +131,9 @@ class ApiRequests:
 
 
     def create_task_email(self):
-        self.username = self.email_sender
-        self.password = self.email_sender_password
         self.mail_server = self.email_box_ip
         self.imap_server = imaplib.IMAP4_SSL(host=self.mail_server, port=993)
-        self.imap_server.login(self.username, self.password)
+        self.imap_server.login(self.email_box_login, self.email_box_password)
 
         self.imap_server.select('inbox')
         self.search_criteria = None
